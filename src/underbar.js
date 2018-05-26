@@ -125,40 +125,6 @@
         result.push(item);
       }
     });
-   
-//create a new array
-  //   var result = [];
-  //   var compareArray = []
-  //   var finalResult = [] 
-		// var iterator = iterator || _.identity
-
-
-//this code handles the iterator
-
-    // for (var i = 0; i < array.length; i++) {
-    //   var iterated = iterator(array[i]);
-    //   result.push(iterated)
-    // }
-
-  //  	_.each(array, function(item, index){
-		// 	 var iterated = iterator(item)
-  //      result.push(item);
-		// })
-
-//this code adds to the result array
-    
-// this code handles unique items
-    // _.each(result, function(item, index){
-    //   if(!compareArray.includes(item)) {
-    //     compareArray.push(result[index]);
-    //     finalResult.push(array[index]);
-    //   }
-    // })
-
-
-// //store values, 
-// //and avoid duplicate values 
-// //return array 
 		return result;
   };
 
@@ -265,13 +231,13 @@
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
-    // TIP: There's a very clever way to re-use every() here.
+    // TIP: There's a very clever way to re-use every() on.
      if (iterator === undefined) {
       iterator = _.identity;
     }
     return !!_.reduce(collection, function(alltrue, currvalue){
       return alltrue || iterator(currvalue);
-    }, true)
+    }, false)
   };
 
 
@@ -315,7 +281,7 @@
   _.defaults = function(obj) {
     _.each(arguments, function(objvalue){
       _.each(objvalue, function(value, key){
-        if(!obj[key]){
+        if(obj[key] === undefined){
           obj[key] = value;  
         }
       })
@@ -364,8 +330,41 @@
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
+  //   _.memoize = function(func) {
+  //   var results = {};
+
+  //   return function(key) {
+  //     if (!(key in results)) {
+  //       results[key] = func.apply(this,arguments);
+  //     }
+  //     return results[key];
+  //   };
+  // }
   _.memoize = function(func) {
+    var cache = {};
+
+    return function() {
+      var key = JSON.stringify(arguments);
+
+      if (!cache[key]) {
+        cache[key] = func.apply(this, arguments);
+      }
+      return cache[key];
+    };
   };
+
+  //   _.memoize = function(func) {
+  //   var answers={};
+  //   return function() {
+  //     var args=Array.prototype.slice.call(arguments);
+  //     if(answers[args]===undefined) {
+  //       answers[args]=func.apply(this, args);
+  //     }
+
+  //     return answers[args];
+  //   };
+  // };
+
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
@@ -374,6 +373,16 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var newArgs = [];
+    if (arguments.length > 2) {
+      for (var i = 2; i < arguments.length; i++) {
+        newArgs[i - 2] = arguments[i];
+      }
+      setTimeout(func.apply(this,newArgs), wait);
+    }
+    else {
+      setTimeout(func, wait);
+    }
   };
 
 
@@ -388,8 +397,16 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var copy = array.slice(0,array.length)
+    var shuffled = [];
+    var index;
+    for (var i = 0; i < array.length; i++) {
+      index = Math.floor(Math.random()*copy.length);
+      shuffled.push(copy[index]);
+      copy.splice(index,1);
+    }
+    return shuffled;
   };
-
 
   /**
    * ADVANCED
